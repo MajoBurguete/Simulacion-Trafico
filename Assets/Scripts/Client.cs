@@ -101,7 +101,7 @@ public class Client : MonoBehaviour
     {
         WWWForm form = new WWWForm();
 
-        using (UnityWebRequest www = UnityWebRequest.Post("https://simulaciontrafico-noisy-guanaco-wx.mybluemix.net/simulations", form))
+        using (UnityWebRequest www = UnityWebRequest.Post("http://localhost:5000/simulations", form))
         {
             yield return www.SendWebRequest();
 
