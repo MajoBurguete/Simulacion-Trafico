@@ -81,9 +81,14 @@ public class Client : MonoBehaviour
     public GameObject prefabAuto3;
     public GameObject prefabAuto4;
     public GameObject prefabAuto5;
+    public GameObject trafficlight;
+    public Texture greenLight;
+    public Texture redLight;
     List<GameObject> listaCoches;
+    List<GameObject> listaTlights;
+    List<List<float>> tlightPos = new List<List<float>>();
     public MyCar[] cars;
-    private float waitTime = 0.1f;
+    private float waitTime = 0.2f;
     private float timer = 0.0f;
     public MyCar[] carsObj;
     public MyTrafficLight[] trafficObj;
@@ -119,6 +124,36 @@ public class Client : MonoBehaviour
 
     }
 
+    void addTlightsPositions()
+    {
+        // 0 - 3
+        tlightPos.Add(new List<float>() { 265.0f, 1.5f, 265.0f });
+        tlightPos.Add(new List<float>() { 335.0f, 1.5f, 340.0f });
+        tlightPos.Add(new List<float>() { 265.0f, 1.5f, 340.0f });
+        tlightPos.Add(new List<float>() { 335.0f, 1.5f, 265.0f });
+        // 4 - 7
+        tlightPos.Add(new List<float>() { 44.0f, 1.5f, 265.0f });
+        tlightPos.Add(new List<float>() { 113.0f, 1.5f, 340.0f });
+        tlightPos.Add(new List<float>() { 44.0f, 1.5f, 340.0f });
+        tlightPos.Add(new List<float>() { 113.0f, 1.5f, 265.0f });
+        // 8 - 11
+        tlightPos.Add(new List<float>() { 487.0f, 1.5f, 267.0f });
+        tlightPos.Add(new List<float>() { 555.0f, 1.5f, 337.0f });
+        tlightPos.Add(new List<float>() { 487.0f, 1.5f, 337.0f });
+        tlightPos.Add(new List<float>() { 555.0f, 1.5f, 267.0f });
+        // 12 - 15
+        tlightPos.Add(new List<float>() { 265.0f, 1.5f, 43.0f });
+        tlightPos.Add(new List<float>() { 334.0f, 1.5f, 118.0f });
+        tlightPos.Add(new List<float>() { 265.0f, 1.5f, 118.0f });
+        tlightPos.Add(new List<float>() { 334.0f, 1.5f, 43.0f });
+        // 16 - 19
+        tlightPos.Add(new List<float>() { 265.0f, 1.5f, 482.0f });
+        tlightPos.Add(new List<float>() { 335.0f, 1.5f, 558.0f });
+        tlightPos.Add(new List<float>() { 265.0f, 1.5f, 558.0f });
+        tlightPos.Add(new List<float>() { 335.0f, 1.5f, 482.0f });
+
+    }
+
     IEnumerator UpdatePositions()
     {
         using (UnityWebRequest www = UnityWebRequest.Get(simulationURL))
@@ -133,7 +168,7 @@ public class Client : MonoBehaviour
                 AgentCollection agents = JsonUtility.FromJson<AgentCollection>(www.downloadHandler.text);
                 if (start == 0)
                 {
-                    instantiateGameObjects(agents.cars);
+                    instantiateGameObjects(agents.cars, agents.tlights);
                 }
                 else
                 {
@@ -141,8 +176,10 @@ public class Client : MonoBehaviour
                     {
                         positionCar(agents.cars[i], listaCoches[i]);
                     }
-                    foreach (MyTrafficLight tlight in agents.tlights)
-                        Debug.Log(tlight.ToString());
+                    for (int i = 0; i < agents.tlights.Length; i++)
+                    {
+                        changeTlight(agents.tlights[i], listaTlights[i]);
+                    }
                 }
                 start++;
                 // transform.position = new Vector3(cars[0].x, 0, cars[0].y);                
@@ -155,9 +192,24 @@ public class Client : MonoBehaviour
         carObj.transform.position = new Vector3(car.x, 1.5f, car.y);
     }
 
-    void instantiateGameObjects(MyCar[] cars)
+    void changeTlight(MyTrafficLight tlight, GameObject tlObj)
+    {
+        if (tlight.state)
+        {
+            tlObj.GetComponent<MeshRenderer>().material.SetTexture("_EmissionMap", greenLight);
+        }
+        else
+        {
+            tlObj.GetComponent<MeshRenderer>().material.SetTexture("_EmissionMap", redLight);
+        }
+    }
+
+    void instantiateGameObjects(MyCar[] cars, MyTrafficLight[] tlights)
     {
         listaCoches = new List<GameObject>();
+        listaTlights = new List<GameObject>();
+
+        addTlightsPositions();
 
         for (int i = 0; i < cars.Length; i++)
         {
@@ -204,6 +256,36 @@ public class Client : MonoBehaviour
                 carObj.transform.Rotate(-90.0f, 0.0f, 0.0f, Space.Self);
             }
         }
+
+        for (int i = 0; i < tlights.Length; i++)
+        {
+            GameObject prefabT = trafficlight;
+
+            listaTlights.Add(Instantiate(prefabT, new Vector3(tlightPos[i][0], tlightPos[i][1], tlightPos[i][2]), Quaternion.identity));
+        }
+
+        for (int i = 0; i < listaTlights.Count; i++)
+        {
+            MyTrafficLight tlightL = tlights[i];
+            GameObject tlightObj = listaTlights[i];
+            if (tlightL.direction == 0)
+            {
+                tlightObj.transform.Rotate(-90.0f, 0.0f, -90.0f, Space.Self);
+            }
+            if (tlightL.direction == 1)
+            {
+                tlightObj.transform.Rotate(-90.0f, 0.0f, 90.0f, Space.Self);
+            }
+            if (tlightL.direction == 2)
+            {
+                tlightObj.transform.Rotate(-90.0f, 0.0f, 0.0f, Space.Self);
+            }
+            if (tlightL.direction == 3)
+            {
+                tlightObj.transform.Rotate(-90.0f, 0.0f, 180.0f, Space.Self);
+            }
+        }
+
     }
 
     // Update is called once per frame
