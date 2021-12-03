@@ -70,7 +70,7 @@ class AgentCollection
 }
 
 
-public class Client : MonoBehaviour
+public class Simulation : MonoBehaviour
 {
     string simulationURL;
     public GameObject prefabAuto1;
@@ -89,7 +89,6 @@ public class Client : MonoBehaviour
     private float timer = 0.0f;
     public MyCar[] carsObj;
     public MyTrafficLight[] trafficObj;
-    public Car carsManager = new Car();
     int start = 0;
 
 

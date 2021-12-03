@@ -140,7 +140,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8408155549221462353, guid: 2d1a9d079fc73495fb827aa0c2cf7ded, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 5.9657364
+      value: 5.4
       objectReference: {fileID: 0}
     - target: {fileID: 8408155549221462353, guid: 2d1a9d079fc73495fb827aa0c2cf7ded, type: 3}
       propertyPath: m_LocalPosition.z
@@ -3062,7 +3062,6 @@ MonoBehaviour:
   cars: []
   carsObj: []
   trafficObj: []
-  carsManager: {fileID: 0}
 --- !u!4 &606362898 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 7036432983732322039, guid: b0ab6d8f69df6d740869326691403bce, type: 3}
@@ -3822,7 +3821,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 963194225}
   m_LocalRotation: {x: 0.7071068, y: 0, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: 300, y: 600, z: 300}
+  m_LocalPosition: {x: 302, y: 600, z: 305}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
