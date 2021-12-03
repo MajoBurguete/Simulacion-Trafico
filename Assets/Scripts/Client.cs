@@ -40,11 +40,8 @@ public class MyCar
     public int x;
     public int y;
     public int direction;
-    public int speed;
-    public int acceleration;
     public int car_type;
-    public int max_speed;
-    public List<List<int>> route;
+    public bool active;
     override public string ToString()
     {
         return "Id: " + id + ", X: " + x + ", Y: " + y;
@@ -88,7 +85,7 @@ public class Client : MonoBehaviour
     List<GameObject> listaTlights;
     List<List<float>> tlightPos = new List<List<float>>();
     public MyCar[] cars;
-    private float waitTime = 0.2f;
+    private float waitTime = 0.3f;
     private float timer = 0.0f;
     public MyCar[] carsObj;
     public MyTrafficLight[] trafficObj;
@@ -106,7 +103,7 @@ public class Client : MonoBehaviour
     {
         WWWForm form = new WWWForm();
 
-        using (UnityWebRequest www = UnityWebRequest.Post("http://localhost:5000/simulations", form))
+        using (UnityWebRequest www = UnityWebRequest.Post("https://simulaciontrafico-noisy-guanaco-wx.mybluemix.net/simulations", form))
         {
             yield return www.SendWebRequest();
 
@@ -181,15 +178,22 @@ public class Client : MonoBehaviour
                         changeTlight(agents.tlights[i], listaTlights[i]);
                     }
                 }
-                start++;
-                // transform.position = new Vector3(cars[0].x, 0, cars[0].y);                
+                start++;             
             }
         }
     }
 
     void positionCar(MyCar car, GameObject carObj)
     {
-        carObj.transform.position = new Vector3(car.x, 1.5f, car.y);
+        if (car.active)
+        {
+            carObj.transform.position = new Vector3(car.x, 1.5f, car.y);
+            rotateCarDirection(car, carObj);
+        }
+        else
+        {
+            Destroy(carObj);
+        }
     }
 
     void changeTlight(MyTrafficLight tlight, GameObject tlObj)
@@ -201,6 +205,26 @@ public class Client : MonoBehaviour
         else
         {
             tlObj.GetComponent<MeshRenderer>().material.SetTexture("_EmissionMap", redLight);
+        }
+    }
+
+    void rotateCarDirection(MyCar car, GameObject carObj)
+    {
+        if (car.direction == 0)
+        {
+            carObj.transform.eulerAngles = new Vector3(-90.0f, 0.0f, 90.0f);
+        }
+        if (car.direction == 1)
+        {
+            carObj.transform.eulerAngles = new Vector3(-90.0f, 0.0f, -90.0f);
+        }
+        if (car.direction == 2)
+        {
+            carObj.transform.eulerAngles = new Vector3(-90.0f, 0.0f, 180.0f);
+        }
+        if (car.direction == 3)
+        {
+            carObj.transform.eulerAngles = new Vector3(-90.0f, 0.0f, 0.0f);
         }
     }
 
@@ -232,29 +256,13 @@ public class Client : MonoBehaviour
             {
                 prefab = prefabAuto4;
             }
+
             listaCoches.Add(Instantiate(prefab, new Vector3(car.x, 1.5f, car.y), Quaternion.identity));
         }
 
         for (int i = 0; i < listaCoches.Count; i++)
         {
-            MyCar car = cars[i];
-            GameObject carObj = listaCoches[i];
-            if (car.direction == 0)
-            {
-                carObj.transform.Rotate(-90.0f, 0.0f, 90.0f, Space.Self);
-            }
-            if (car.direction == 1)
-            {
-                carObj.transform.Rotate(-90.0f, 0.0f, -90.0f, Space.Self);
-            }
-            if (car.direction == 2)
-            {
-                carObj.transform.Rotate(-90.0f, 0.0f, 180.0f, Space.Self);
-            }
-            if (car.direction == 3)
-            {
-                carObj.transform.Rotate(-90.0f, 0.0f, 0.0f, Space.Self);
-            }
+            rotateCarDirection(cars[i], listaCoches[i]);
         }
 
         for (int i = 0; i < tlights.Length; i++)
